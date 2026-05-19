@@ -1,61 +1,57 @@
-# Next.js Architecture Starter
+# Expo Architecture Starter
 
-A clean and modular Next.js starter designed to accelerate development while maintaining a robust and maintainable architecture.
+A modular and reusable Expo starter designed for building clean and maintainable mobile applications.
 
 ## 🚀 Purpose
 
-This project provides a solid foundation for building modern web applications with:
+This project provides a solid base to quickly start mobile app development with:
 
-- Clear folder structure
+- Structured architecture
 - Reusable components
-- Centralized styles
-- Custom hooks and utilities
+- Shared logic and utilities
 - Global state management with Redux
-- Generic API handling
-
-Instead of starting from scratch, this starter allows you to focus directly on business logic.
+- Consistent UI patterns
 
 ## 🧱 Architecture
 
-The project is structured to promote:
+Designed to ensure:
 
-- Separation of concerns
-- Reusability
-- Readability
-- Easy evolution of features
+- Clear separation between UI, logic, and data
+- Reusability across screens
+- Maintainability and flexibility
 
 ## ⚙️ Included Features
 
-- Pre-configured project structure
-- Reusable components
+- Predefined folder structure
 - Custom hooks and utilities
+- Reusable UI components
 - Centralized styling system
 - Redux state management
-- Generic fetch wrapper with error handling
+- Generic API handling with error management
 
 ## 📦 Tech Stack
 
-- Next.js
-- React
+- Expo
+- React Native
 - TypeScript
 - Redux
 
 ## 🎯 Philosophy
 
-This is not just a template, but a development base designed to:
+This starter focuses on:
 
-- Save time on setup
-- Encourage clean code practices
-- Provide consistency across projects
+- Developer efficiency
+- Code consistency
+- Maintainable mobile architecture
 
 ## 🛠️ Usage
 
-Clone the repository and adapt it to your needs:
+Use this starter as a base and adapt it:
 
-- Remove unnecessary parts
-- Extend existing utilities
-- Add your own business logic
+- Customize components
+- Extend utilities
+- Integrate APIs depending on your project
 
 ## 📌 Note
 
-This project intentionally does not enforce authentication or external integrations, allowing full flexibility depending on project requirements.
+No authentication or backend connection is enforced, giving full flexibility for implementation.
