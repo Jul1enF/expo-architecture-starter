@@ -67,38 +67,39 @@ const sameObjects = (a : unknown, b : unknown) => {
 }
 
 
-export const findSelectedItemTitle = ({ data, sectionToSelectKey, titleToSelectKey, selectedItem } : FindSelectItemTitleOptions) : string => {
+export const findSelectedItemTitle = ({ data, valueKey, titleKey, selectedItem } : FindSelectItemTitleOptions) : string => {
 
     let title = ""
-    const titleKey = titleToSelectKey ?? "title"
+    const resolvedTitleKey = titleKey ?? "title"
 
     for (let item of data) {
-        const selectedSection = sectionToSelectKey && itemHasKey(item, sectionToSelectKey) ? item[sectionToSelectKey] : null
+        const selectedSection = valueKey && itemHasKey(item, valueKey) ? item[valueKey] : null
 
-        // If there is no section to select in the data array of object
-        if (!sectionToSelectKey) {
-            //selectedItem is an object, check if a title field match the item title field
-            if (itemHasStringValue(item, titleKey) && itemHasStringValue(selectedItem, titleKey) && item[titleKey] === selectedItem[titleKey]) {
-                title = item[titleKey]
+        // Case where there is no key/value to select in the data array of items (which are objects, prior check in Autocomplete)
+
+        if (!valueKey) {
+            // selectedItem is an object (because without valueKey the all item is selected), check if a title field match the item title field
+            if (itemHasStringValue(item, resolvedTitleKey) && itemHasStringValue(selectedItem, resolvedTitleKey) && item[resolvedTitleKey] === selectedItem[resolvedTitleKey]) {
+                title = item[resolvedTitleKey]
                 break;
             }
         }
 
         // There was a section of the items that was selected : trying to find the one matching selectedItem
-        else if (typeof selectedSection === "string" && itemHasStringValue(item, titleKey) && selectedSection === selectedItem) {
-            title = item[titleKey]
+        else if (typeof selectedSection === "string" && itemHasStringValue(item, resolvedTitleKey) && selectedSection === selectedItem) {
+            title = item[resolvedTitleKey]
             break;
         }
-        else if (hasId(selectedSection) && hasId(selectedItem) && itemHasStringValue(item, titleKey) && selectedSection._id === selectedItem._id) {
-            title = item[titleKey]
+        else if (hasId(selectedSection) && hasId(selectedItem) && itemHasStringValue(item, resolvedTitleKey) && selectedSection._id === selectedItem._id) {
+            title = item[resolvedTitleKey]
             break;
         }
-        else if (Array.isArray(selectedSection) && itemHasStringValue(item, titleKey) && sameArrays(selectedItem, selectedSection)) {
-            title = item[titleKey]
+        else if (Array.isArray(selectedSection) && itemHasStringValue(item, resolvedTitleKey) && sameArrays(selectedItem, selectedSection)) {
+            title = item[resolvedTitleKey]
             break;
         }
-        else if (itemHasStringValue(item, titleKey) && typeof selectedSection === "object" && sameObjects(selectedItem, selectedSection)) {
-            title = item[titleKey]
+        else if (itemHasStringValue(item, resolvedTitleKey) && typeof selectedSection === "object" && sameObjects(selectedItem, selectedSection)) {
+            title = item[resolvedTitleKey]
             break;
         }
     }

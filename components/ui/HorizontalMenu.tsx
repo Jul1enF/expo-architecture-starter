@@ -4,8 +4,8 @@ import { RPH, RPW, phoneDevice } from "@/utils/dimensions"
 import { appStyle } from "@/styles/appStyle"
 import { useRouter } from "expo-router";
 
-// titleToSelectKey props => if the item is an object without a "title" key, the key with the value of the title to display
-// sectionToSelectKey props => if the item is an object and the title shouldn't be selected with setChosenItem, the key whose value will be chosen
+// titleKey props => if the item is an object without a "title" key, the key with the value of the title to display
+// valueKey props => if the item is an object and the title shouldn't be selected with setChosenItem, the key whose value will be chosen
 
 // TYPES
 type HorizontalMenuDataElem = 
@@ -13,12 +13,12 @@ type HorizontalMenuDataElem =
 
 export type HorizontalMenuData = HorizontalMenuDataElem[] | { [category: string]: HorizontalMenuDataElem }
 
-type HorizontalMenuProps = { data: HorizontalMenuData; menuBelow?: boolean, menuFunction?: () => void, titleToSelectKey?: string, chosenItem: string, setChosenItem: Dispatch<SetStateAction<string>>, sectionToSelectKey?: string, countProp?: string, sortByLength?: boolean }
+type HorizontalMenuProps = { data: HorizontalMenuData; menuBelow?: boolean, menuFunction?: () => void, titleKey?: string, chosenItem: string, setChosenItem: Dispatch<SetStateAction<string>>, valueKey?: string, countProp?: string, sortByLength?: boolean }
 
 
 // COMPONENT 
 
-export function HorizontalMenu({ data, menuBelow = false, menuFunction, titleToSelectKey, chosenItem, setChosenItem, sectionToSelectKey, countProp, sortByLength }: HorizontalMenuProps) {
+export function HorizontalMenu({ data, menuBelow = false, menuFunction, titleKey, chosenItem, setChosenItem, valueKey, countProp, sortByLength }: HorizontalMenuProps) {
 
     const router = useRouter()
 
@@ -47,9 +47,9 @@ export function HorizontalMenu({ data, menuBelow = false, menuFunction, titleToS
     // Function to know if an item is selected
     const isItemSelected = (item: HorizontalMenuDataElem): boolean => {
         if (typeof item === "string") return item === chosenItem
-        else if (sectionToSelectKey && typeof item[sectionToSelectKey] === "string")
-            return item[sectionToSelectKey] === chosenItem
-        else if (titleToSelectKey) return item[titleToSelectKey] === chosenItem
+        else if (valueKey && typeof item[valueKey] === "string")
+            return item[valueKey] === chosenItem
+        else if (titleKey) return item[titleKey] === chosenItem
         else if (typeof item.title === "string") return item.title === chosenItem
         else return false
     }
@@ -85,7 +85,7 @@ export function HorizontalMenu({ data, menuBelow = false, menuFunction, titleToS
 
         const itemSelected = isItemSelected(item)
 
-        const elemToSelect = extractRelevantString(sectionToSelectKey ?? titleToSelectKey ?? "title") ?? ""
+        const elemToSelect = extractRelevantString(valueKey ?? titleKey ?? "title") ?? ""
 
         const itemPress = () => {
             setChosenItem(elemToSelect)
@@ -96,7 +96,7 @@ export function HorizontalMenu({ data, menuBelow = false, menuFunction, titleToS
             }
         }
 
-        const title = extractRelevantString(titleToSelectKey ?? "title") ?? ""
+        const title = extractRelevantString(titleKey ?? "title") ?? ""
 
         return (
             <TouchableOpacity style={[styles.itemBtn, itemSelected ? styles.selectedItemBtn : styles.unselectedItemBtn]} onPress={itemPress}>

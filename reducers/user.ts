@@ -40,15 +40,7 @@ export const userSlice = createSlice({
             state.value = action.payload
         },
         logout: (state: UserState) => {
-            state.value = {
-                first_name: "",
-                last_name: "",
-                email: "",
-                push_token: "",
-                jwtToken: "",
-                bookmarks: [],
-                _id: "",
-            }
+            state.value = { ...initialState.value }
         },
         changePushToken: (state, action: PayloadAction<string>) => {
             state.value.push_token = action.payload

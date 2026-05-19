@@ -3,12 +3,14 @@ import { Dispatch, ReactNode, SetStateAction, RefObject } from "react";
 
 // ITEM TYPES
 
-export type AutocompleteItem = string | {
+type AutocompleteObjectItem = {
     title?: string;
     boldTitle?: string;
     lightTitle?: string;
     [key: string]: unknown;
 }
+
+export type AutocompleteItem = string | AutocompleteObjectItem
 
 
 
@@ -16,8 +18,8 @@ export type AutocompleteItem = string | {
 
 // SHARED TYPES
 type ComponentsSharedProps = {
-    sectionToSelectKey?: string;
-    titleToSelectKey?: string;
+    valueKey?: string;
+    titleKey?: string;
     emptyResultText?: string;
     dropdownMaxHeight?: number;
     dropdownContainerStyle?: ViewStyle;
@@ -31,10 +33,10 @@ type ComponentsSharedProps = {
 
 
 // AUTOCOMPLETE
-export type AutocompleteProps = ComponentsSharedProps & {
-    data?: AutocompleteItem[];
-    setSelectedItem: Dispatch<SetStateAction<unknown>>;
-    selectedItem: unknown;
+export type AutocompleteProps<T = unknown> = ComponentsSharedProps & {
+    data: AutocompleteItem[];
+    setSelectedItem: Dispatch<SetStateAction<T>> | Dispatch<SetStateAction<T | null>>;
+    selectedItem: T | null;
     placeholderText?: string;
     placeholderColor?: ColorValue;
     inputStyle?: StyleProp<TextStyle & ViewStyle>;
@@ -78,12 +80,12 @@ export type AutocompleteContextType = {
 // HOOK / UTILS
 export type UseDropdownPositionOptions = {
     dropdownHeight: null | number;
-    autocompleteInputRef: RefObject<TextInput | null>; 
+    autocompleteInputRef: RefObject<TextInput | null>;
     tabBar?: boolean;
     header?: boolean;
     dropdownId: string;
     pressLocation: ScreenLocationType | null;
-    closeDropdown: ()=>void;
+    closeDropdown: () => void;
 }
 
 export type InputMeasureType = ScreenLocationType & {
@@ -92,8 +94,8 @@ export type InputMeasureType = ScreenLocationType & {
 }
 
 export type FindSelectItemTitleOptions = {
-    data: AutocompleteItem[];
-    sectionToSelectKey?: string;
-    titleToSelectKey?: string;
+    data: AutocompleteObjectItem[];
+    valueKey?: string;
+    titleKey?: string;
     selectedItem: unknown;
 }

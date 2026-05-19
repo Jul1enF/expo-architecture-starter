@@ -14,22 +14,20 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Feather from '@expo/vector-icons/Feather';
 
 // TO DISPLAY CORRECTLY THE ITEMS OF THE DATA LIST ONE OF THOSE THREE CONDITIONS MUST BE RESPECTED :
-// - THE ITEMS HAVE A FIELD TITLE
-// - THE AUTCOMPLETE HAVE THE PROPS TITLETOSELECTKEY
+// - THE ITEMS ARE OBJECT AND HAVE A KEY "title"
+// - THE ITEMS ARE OBJECT AND THE AUTCOMPLETE HAS THE PROPS "titleKey"
 // - THE ITEMS ARE DIRECTLY A STRING
 
 // BETTER TO USE IN A SCROLLVIEW WITH : keyboardShouldPersistTaps="handled" TO HAVE ICONS PRESSABLE EVEN WHEN ANOTHER INPUT IS FOCUSED
 
-// SELECTEDITEM IS MANDATORY
-
 // THE PARENT MUST NOT HAVE alignItems : "strech"
 
-export default function Autocomplete({
-    data = [],
+export default function Autocomplete < T = unknown > ({
+    data,
     setSelectedItem,
     selectedItem,
-    sectionToSelectKey, // if items are object, field to select if not the all the item
-    titleToSelectKey, // if items are object with no "title" key, the field to display
+    valueKey, // if items are object, field to select if not the all the item
+    titleKey, // if items are object with no "title" key, the field to display
     placeholderText = "",
     placeholderColor = appStyle.placeholderColor,
     dropdownMaxHeight = phoneDevice ? RPW(55) : 350,
@@ -48,7 +46,7 @@ export default function Autocomplete({
     autoCapitalize,
     tabBar = true,
     header = true,
-} : AutocompleteProps) {
+}: AutocompleteProps) {
 
 
     // VAR, STATES AND HOOKS
@@ -65,9 +63,9 @@ export default function Autocomplete({
     const { setDropdownProps, currentDropdownId, setCurrentDropdownId } = useDropdownProps() ?? {}
 
     // Var to help set selectedItem
-    const itemsAreStrings = data.length > 0 && typeof data[0] === "string"
+    const itemsAreStrings = data.length > 0 && data.every(e => typeof e === "string")
     const registerAString = itemsAreStrings || canCreate === "string"
-    const titleKey = titleToSelectKey ?? "title"
+    const resolvedTitleKey = titleKey ?? "title"
 
 
 
@@ -94,14 +92,15 @@ export default function Autocomplete({
         }
         else if (selectedItem && selectedItem !== inputValue) {
 
-            if (typeof selectedItem === "string") {
+            if (itemsAreStrings && typeof selectedItem === "string") {
                 setInputValue(selectedItem)
                 return
             }
+            else if (data.every(e => typeof e !== "string")) {
+                const selectedItemTitle = findSelectedItemTitle({ data, valueKey, titleKey, selectedItem })
 
-            const selectedItemTitle = findSelectedItemTitle({ data, sectionToSelectKey, titleToSelectKey, selectedItem })
-
-            if (selectedItemTitle && selectedItemTitle !== inputValue) setInputValue(selectedItemTitle)
+                if (selectedItemTitle && selectedItemTitle !== inputValue) setInputValue(selectedItemTitle)
+            }
         }
     }, [selectedItem, data])
 
@@ -114,11 +113,10 @@ export default function Autocomplete({
         if (!inputValue || !editable) return data
         else {
             const inputTxtLC = inputValue.toLowerCase()
-            const titleKey = titleToSelectKey ?? "title"
 
             return data.filter(e => typeof e === "string" ? e.toLowerCase().includes(inputTxtLC) :
-                itemHasStringValue(e, titleKey) ? e[titleKey].toLowerCase().includes(inputTxtLC) :
-                false
+                itemHasStringValue(e, resolvedTitleKey) ? e[resolvedTitleKey].toLowerCase().includes(inputTxtLC) :
+                    false
             )
         }
     }, [data, inputValue])
@@ -155,8 +153,8 @@ export default function Autocomplete({
         setDropdownProps && setDropdownProps({
             flatlistData,
             setSelectedItem,
-            sectionToSelectKey,
-            titleToSelectKey,
+            valueKey,
+            titleKey,
             closeDropdown,
             emptyResultText,
             layoutStyle,
@@ -195,13 +193,13 @@ export default function Autocomplete({
 
 
     // USEEFFECT TO RESET DROPDOWN VISIBLE IF THE ID OF THE CURRENT DROPDOWN IS NOT THIS ONE
-    useEffect(()=>{
-        if (dropdownVisible && !currentDropdownId || dropdownVisible && currentDropdownId !== dropdownIdRef.current){
+    useEffect(() => {
+        if (dropdownVisible && !currentDropdownId || dropdownVisible && currentDropdownId !== dropdownIdRef.current) {
             setDropdownVisible(false)
         }
-    },[currentDropdownId])
+    }, [currentDropdownId])
 
-    
+
 
 
     return (
@@ -212,19 +210,19 @@ export default function Autocomplete({
 
                 if (canCreate) {
                     registerAString ? setSelectedItem(e) :
-                        setSelectedItem({ [titleKey]: e, ...(sectionToSelectKey && { [sectionToSelectKey]: e }) })
+                        setSelectedItem({ [resolvedTitleKey]: e, ...(valueKey && { [valueKey]: e }) })
                 }
             }}
             onSubmitEditing={(e) => {
                 const text = e.nativeEvent.text.toLowerCase()
                 const foundItem = data.find(elem => typeof elem === "string" ? elem.toLowerCase() === text :
-                    itemHasStringValue(elem, titleKey) ? elem[titleKey].toLowerCase() === text : false)
+                    itemHasStringValue(elem, resolvedTitleKey) ? elem[resolvedTitleKey].toLowerCase() === text : false)
 
                 if (foundItem) {
-                    setSelectedItem(sectionToSelectKey && itemHasKey(foundItem, sectionToSelectKey) ? foundItem[sectionToSelectKey] : foundItem)
+                    setSelectedItem(valueKey && itemHasKey(foundItem, valueKey) ? foundItem[valueKey] : foundItem)
                 } else if (canCreate) {
                     registerAString ? setSelectedItem(e.nativeEvent.text) :
-                        setSelectedItem({ [titleKey]: e.nativeEvent.text, ...(sectionToSelectKey && { [sectionToSelectKey]: e.nativeEvent.text }) })
+                        setSelectedItem({ [resolvedTitleKey]: e.nativeEvent.text, ...(valueKey && { [valueKey]: e.nativeEvent.text }) })
                 }
             }}
             onFocus={() => {

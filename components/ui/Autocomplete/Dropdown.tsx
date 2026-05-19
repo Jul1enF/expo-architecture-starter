@@ -12,7 +12,7 @@ type PressTypes = {
     setPressLocation: Dispatch<SetStateAction<ScreenLocationType | null>>
 }
 
-export default function Dropdown({ flatlistData, setSelectedItem, sectionToSelectKey, titleToSelectKey, closeDropdown, emptyResultText, layoutStyle = {}, dropdownMaxHeight, dropdownContainerStyle = {}, dropdownItemStyle = {}, dropdownTextStyle = {}, boldTitleWeight = "700", dropdownLineColor, autocompleteInputRef, tabBar, header, dropdownId, pressLocation, setPressLocation }: DropDownProps & PressTypes) {
+export default function Dropdown({ flatlistData, setSelectedItem, valueKey, titleKey, closeDropdown, emptyResultText, layoutStyle = {}, dropdownMaxHeight, dropdownContainerStyle = {}, dropdownItemStyle = {}, dropdownTextStyle = {}, boldTitleWeight = "700", dropdownLineColor, autocompleteInputRef, tabBar, header, dropdownId, pressLocation, setPressLocation }: DropDownProps & PressTypes) {
 
     // useEffect to reset a potential register value of the location of a tap
     useEffect(() => {
@@ -35,7 +35,7 @@ export default function Dropdown({ flatlistData, setSelectedItem, sectionToSelec
     // Dropdown item component for the flatlist
     const DropdownItem = ({ item }: { item: AutocompleteItem | null}) => {
 
-        const title = (titleToSelectKey && itemHasStringValue(item, titleToSelectKey)) ? item[titleToSelectKey] : itemHasStringValue(item, "title") ? item.title :
+        const title = (titleKey && itemHasStringValue(item, titleKey)) ? item[titleKey] : itemHasStringValue(item, "title") ? item.title :
             typeof item === "string" ? item : null
             
         return (
@@ -75,7 +75,7 @@ export default function Dropdown({ flatlistData, setSelectedItem, sectionToSelec
             <FlatList
                 data={flatlistData}
                 keyExtractor={(item, index) => {
-                    if (sectionToSelectKey && itemHasKey(item, sectionToSelectKey) && itemHasStringValue(item[sectionToSelectKey], "_id")) return item[sectionToSelectKey]._id
+                    if (valueKey && itemHasKey(item, valueKey) && itemHasStringValue(item[valueKey], "_id")) return item[valueKey]._id
                     else if (itemHasStringValue(item, "_id")) return item._id
                     else return index.toString()
                 }}
@@ -89,7 +89,7 @@ export default function Dropdown({ flatlistData, setSelectedItem, sectionToSelec
                 }}
                 renderItem={({ item, index }) =>
                     <TouchableOpacity onPress={() => {
-                        setSelectedItem((sectionToSelectKey && itemHasKey(item, sectionToSelectKey)) ? item[sectionToSelectKey] : item)
+                        setSelectedItem((valueKey && itemHasKey(item, valueKey)) ? item[valueKey] : item)
                         closeDropdown()
                     }} >
                         <DropdownItem item={item} />

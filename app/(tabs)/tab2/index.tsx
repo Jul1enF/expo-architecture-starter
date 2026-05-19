@@ -32,7 +32,7 @@ export default function Tab2Page() {
           data={employeeList2}
           setSelectedItem={setSelectedEmployee2}
           selectedItem={selectedEmployee2}
-          titleToSelectKey='first_name'
+          titleKey='first_name'
           inputStyle={[appStyle.input.base]}
           placeholderText='Rechercher un employé 2'
           placeholderColor="black"

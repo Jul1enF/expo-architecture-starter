@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, RefObject } from "react"
+import { hasId } from "./typeGuards"
 
 // FUNCTION TO COUNT THE NUMBER OF DOCS (ARRAYS OR OBJECTS) REGISTERED IN STORED DATA
 
@@ -6,14 +7,10 @@ import { Dispatch, SetStateAction, RefObject } from "react"
 const getDocsCount = (storedData: unknown) => {
 
     // Deserialize data if they have been serialized (by redux)
-    const deserializedData = JSON.parse(JSON.stringify(storedData))
+    const deserializedData : unknown = JSON.parse(JSON.stringify(storedData))
 
     let docsCount = 0
     const visitedDocs = new WeakSet<object>()
-
-    const hasId = (value: unknown): value is { _id: unknown } => {
-        return (typeof value === "object" && value !== null && "_id" in value)
-    }
 
     const extractDocsCount = (doc: unknown) => {
         if (!doc || typeof doc !== "object" || visitedDocs.has(doc)) return
@@ -52,7 +49,20 @@ const getDocsCount = (storedData: unknown) => {
 
 // TYPES
 
-type RequestProps = { path: string, method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH", body?: object, params?: string | object, jwtToken?: string, setSessionExpired?: Dispatch<SetStateAction<boolean>>, functionRef?: RefObject<boolean>, setWarning?: Dispatch<SetStateAction<{ text?: string, success?: boolean }>>, setModalVisible?: Dispatch<SetStateAction<boolean>>, setUploading?: Dispatch<SetStateAction<boolean>>, clearEtag?: boolean, storedData?: unknown }
+type RequestProps = { 
+    path: string;
+    method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+    body?: object;
+    params?: string | object;
+    jwtToken?: string;
+    setSessionExpired?: Dispatch<SetStateAction<boolean>>;
+    functionRef?: RefObject<boolean>;
+    setWarning?: Dispatch<SetStateAction<{ text?: string, success?: boolean }>>;
+    setModalVisible?: Dispatch<SetStateAction<boolean>>;
+    setUploading?: Dispatch<SetStateAction<boolean>>;
+    clearEtag?: boolean;
+    storedData?: unknown 
+}
 
 type CustomHeaders = Partial<Record<"Authorization" | "If-None-Match" | "X-Docs-Count" | "Content-Type",
     string
@@ -82,8 +92,8 @@ export default async function request<SpecificApiData = unknown>(props: RequestP
     const uploading = !!setUploading
     const session = !!setSessionExpired
 
-    let warningText: string = ""
-    let sessionExpired : undefined | boolean
+    let warningText = ""
+    let sessionExpired = false
 
     const readingTime = (text: string | undefined) => text ? Math.round(text.length * 53) : 0
 
@@ -127,8 +137,8 @@ export default async function request<SpecificApiData = unknown>(props: RequestP
         const data = await response.json() as ApiResponse<SpecificApiData>
 
         if (!data.result) {
-            displayWarning(data.errorText ?? undefined)
-            sessionExpired = data.sessionExpired
+            displayWarning(data.errorText)
+            sessionExpired = data.sessionExpired ?? false
             // If the session has not expired (wich mean automatic expulsion of the user), we return the delay during wich the error message will be displayed (in case of an action needed after) and the data in case a check inside is needed
             if (!sessionExpired) return {
                 delay: readingTime(warningText) + 400,

@@ -2,17 +2,24 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
     "paths": {
       "@/styles/*": ["styles/*"],
       "@/components/*": ["components/*"],
       "@/utils/*": ["utils/*"],
       "@/hooks/*": ["hooks/*"],
       "@/reducers/*": ["reducers/*"],
-      "@/store/*" : ["store/*"],
-      "@/app-types/*" : ["types/*"],
+      "@/store/*": ["store/*"],
+      "@/app-types/*": ["types/*"]
     }
   },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ],
   "exclude": ["node_modules", "babel.config.js"]
 }

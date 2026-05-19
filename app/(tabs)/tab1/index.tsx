@@ -23,7 +23,7 @@ export default function Tab1Page() {
   
   return (
     <>
-      <HorizontalMenu data={sectionsArray} titleToSelectKey={"sectionName"} chosenItem={selectedSection} setChosenItem={setSelectedSection} />
+      <HorizontalMenu data={sectionsArray} titleKey={"sectionName"} chosenItem={selectedSection} setChosenItem={setSelectedSection} />
       <View style={styles.body}>
         <Text style={styles.pageTitle}>Tab 1 !</Text>
 
