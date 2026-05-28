@@ -23,7 +23,7 @@ type LateralMenuProps = {
 export type LateralMenuItemBase = {
     sectionName : string;
     link?: string;
-    func?: ()=> void;
+    func?: undefined | (() => void) ;
 }
 
 
@@ -33,7 +33,9 @@ export default function LateralMenu({ menuVisible, setMenuVisible, screenHeight,
 
     const jwtToken = useAppSelector((state) => state.user.value.jwtToken)
     const dispatch = useAppDispatch()
-    const logoutUser = () => dispatch(logout())
+    const logoutUser = () : void => {
+        dispatch(logout())
+    }
 
     const sectionsArray : LateralMenuItemBase[] = [
         { sectionName: "Accueil", link: "/" },

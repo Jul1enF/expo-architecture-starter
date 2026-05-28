@@ -2,10 +2,11 @@ import { View, TouchableOpacity, StyleSheet, Pressable, Animated, Easing, TextIn
 import { useState, useEffect, useRef, useMemo } from "react";
 import MyTextInput from "../MyTextInput";
 import { useDropdownProps } from "./AutocompleteProvider";
-import { AutocompleteProps } from "@/components/ui/Autocomplete/Autocomplete.types";
-import { itemHasKey, itemHasStringValue } from "@/utils/typeGuards";
+import { AutocompleteProps, DropDownProps } from "@/components/ui/Autocomplete/Autocomplete.types";
 
 import { findSelectedItemTitle, createId } from "./AutocompleteUtils";
+import { getStringValue, getKeyValue } from "@/utils/unknownObjectUtils";
+import { isArrayOfString } from "@/utils/typeGuards";
 
 import { RPH, RPW, phoneDevice } from '@/utils/dimensions'
 import { appStyle } from '@/styles/appStyle';
@@ -22,7 +23,7 @@ import Feather from '@expo/vector-icons/Feather';
 
 // THE PARENT MUST NOT HAVE alignItems : "strech"
 
-export default function Autocomplete < T = unknown > ({
+export default function Autocomplete<SelectedItemType = unknown>({
     data,
     setSelectedItem,
     selectedItem,
@@ -39,14 +40,14 @@ export default function Autocomplete < T = unknown > ({
     dropdownLineColor = appStyle.lightGrey,
     boldTitleWeight,
     iconColor,
-    canCreate, // true = create an object if the items are one ; "string" = create a string anycase
+    canCreate, // "object" = create an object in selectedItem ; "string" = create a string
     editable = true,
     showClear = true,
     multiline = false,
     autoCapitalize,
     tabBar = true,
     header = true,
-}: AutocompleteProps) {
+}: AutocompleteProps<SelectedItemType>) {
 
 
     // VAR, STATES AND HOOKS
@@ -57,14 +58,12 @@ export default function Autocomplete < T = unknown > ({
     const autocompleteInputRef = useRef<TextInput>(null)
 
     // Icon container width depending on the display of the clear icon
-    const iconsContainerWidth = appStyle.regularHorizontalPadding + (showClear ? appStyle.inputIconSize * 3.6 : appStyle.inputIconSize * 1.8)
+    const iconsContainerWidth = appStyle.regularHorizontalPadding + ((showClear && inputValue) ? appStyle.inputIconSize * 3.6 : appStyle.inputIconSize * 1.8)
 
     // current dropdown props and id shared through context
     const { setDropdownProps, currentDropdownId, setCurrentDropdownId } = useDropdownProps() ?? {}
 
     // Var to help set selectedItem
-    const itemsAreStrings = data.length > 0 && data.every(e => typeof e === "string")
-    const registerAString = itemsAreStrings || canCreate === "string"
     const resolvedTitleKey = titleKey ?? "title"
 
 
@@ -90,9 +89,25 @@ export default function Autocomplete < T = unknown > ({
             setInputValue("")
             return
         }
-        else if (selectedItem && selectedItem !== inputValue) {
 
-            if (itemsAreStrings && typeof selectedItem === "string") {
+        if (!selectedItem) return
+
+        // For the cases where canCreate = "string" and a registration of the input value has just been made in selectedItem
+        if (canCreate === "string" && typeof selectedItem === "string" && selectedItem === inputValue) {
+            return
+        }
+
+        // For the cases where canCreate = "object" and a registration of the input value has just been made in a title key of the selectedItem object
+        if (canCreate === "object" && typeof selectedItem === "object" &&
+            getStringValue(selectedItem, resolvedTitleKey) === inputValue
+        ) {
+            return
+        }
+
+
+        if (selectedItem && selectedItem !== inputValue) {
+
+            if (isArrayOfString(data) && typeof selectedItem === "string") {
                 setInputValue(selectedItem)
                 return
             }
@@ -114,10 +129,10 @@ export default function Autocomplete < T = unknown > ({
         else {
             const inputTxtLC = inputValue.toLowerCase()
 
-            return data.filter(e => typeof e === "string" ? e.toLowerCase().includes(inputTxtLC) :
-                itemHasStringValue(e, resolvedTitleKey) ? e[resolvedTitleKey].toLowerCase().includes(inputTxtLC) :
-                    false
-            )
+            return data.filter(e => {
+                const title = typeof e === "string" ? e : getStringValue(e, resolvedTitleKey)
+                return title && title.toLowerCase().includes(inputTxtLC)
+            })
         }
     }, [data, inputValue])
 
@@ -168,7 +183,7 @@ export default function Autocomplete < T = unknown > ({
             tabBar,
             header,
             dropdownId: dropdownIdRef.current,
-        })
+        } as DropDownProps)
     }
 
 
@@ -208,21 +223,22 @@ export default function Autocomplete < T = unknown > ({
             onChangeText={(e) => {
                 setInputValue(e)
 
-                if (canCreate) {
-                    registerAString ? setSelectedItem(e) :
-                        setSelectedItem({ [resolvedTitleKey]: e, ...(valueKey && { [valueKey]: e }) })
+                if (canCreate === "string") {
+                    setSelectedItem(e as SelectedItemType)
+                }
+                if (canCreate === "object") {
+                    setSelectedItem({ [resolvedTitleKey]: e, ...(valueKey && { [valueKey]: e }) } as SelectedItemType)
                 }
             }}
             onSubmitEditing={(e) => {
-                const text = e.nativeEvent.text.toLowerCase()
-                const foundItem = data.find(elem => typeof elem === "string" ? elem.toLowerCase() === text :
-                    itemHasStringValue(elem, resolvedTitleKey) ? elem[resolvedTitleKey].toLowerCase() === text : false)
+                const inputValueLC = e.nativeEvent.text.toLowerCase()
+                const foundItem = data.find(e => {
+                    const title = typeof e === "string" ? e : getStringValue(e, resolvedTitleKey)
+                    return title && title.toLowerCase() === inputValueLC
+                })
 
                 if (foundItem) {
-                    setSelectedItem(valueKey && itemHasKey(foundItem, valueKey) ? foundItem[valueKey] : foundItem)
-                } else if (canCreate) {
-                    registerAString ? setSelectedItem(e.nativeEvent.text) :
-                        setSelectedItem({ [resolvedTitleKey]: e.nativeEvent.text, ...(valueKey && { [valueKey]: e.nativeEvent.text }) })
+                    setSelectedItem((!valueKey ? foundItem : getKeyValue(foundItem, valueKey)) as SelectedItemType)
                 }
             }}
             onFocus={() => {
@@ -257,7 +273,7 @@ export default function Autocomplete < T = unknown > ({
 
 
             <View style={{ ...appStyle.inputIconContainer, width: iconsContainerWidth, flexDirection: "row", zIndex: 2 }}>
-                {showClear &&
+                {(showClear && inputValue) &&
                     <TouchableOpacity activeOpacity={0.6} style={[styles.iconContainer]} onPress={() => {
                         setInputValue("")
                         setSelectedItem(null)

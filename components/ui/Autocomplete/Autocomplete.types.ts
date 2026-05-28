@@ -31,17 +31,19 @@ type ComponentsSharedProps = {
     header?: boolean;
 }
 
+type SetSelectedItemType<SelectedItemType> = Dispatch<SetStateAction<SelectedItemType | null>>
+
 
 // AUTOCOMPLETE
-export type AutocompleteProps<T = unknown> = ComponentsSharedProps & {
+export type AutocompleteProps<SelectedItemType = unknown> = ComponentsSharedProps & {
     data: AutocompleteItem[];
-    setSelectedItem: Dispatch<SetStateAction<T>> | Dispatch<SetStateAction<T | null>>;
-    selectedItem: T | null;
+    setSelectedItem: SetSelectedItemType<SelectedItemType>;
+    selectedItem: SelectedItemType | null;
     placeholderText?: string;
     placeholderColor?: ColorValue;
     inputStyle?: StyleProp<TextStyle & ViewStyle>;
     iconColor?: ColorValue;
-    canCreate?: true | "string";
+    canCreate?: "object" | "string";
     editable?: boolean;
     showClear?: boolean;
     multiline?: boolean;
@@ -56,9 +58,9 @@ export type AutocompleteProviderProps = {
 }
 
 
-export type DropDownProps = ComponentsSharedProps & {
+export type DropDownProps<SelectedItemType = unknown> = ComponentsSharedProps & {
     flatlistData?: AutocompleteItem[];
-    setSelectedItem: Dispatch<SetStateAction<unknown>>;
+    setSelectedItem: SetSelectedItemType<SelectedItemType>;
     closeDropdown: () => void;
     layoutStyle: ViewStyle;
     autocompleteInputRef: RefObject<TextInput | null>;
@@ -81,8 +83,8 @@ export type AutocompleteContextType = {
 export type UseDropdownPositionOptions = {
     dropdownHeight: null | number;
     autocompleteInputRef: RefObject<TextInput | null>;
-    tabBar?: boolean;
-    header?: boolean;
+    tabBar?: boolean | undefined;
+    header?: boolean | undefined;
     dropdownId: string;
     pressLocation: ScreenLocationType | null;
     closeDropdown: () => void;
@@ -95,7 +97,7 @@ export type InputMeasureType = ScreenLocationType & {
 
 export type FindSelectItemTitleOptions = {
     data: AutocompleteObjectItem[];
-    valueKey?: string;
-    titleKey?: string;
+    valueKey?: string | undefined;
+    titleKey?: string | undefined;
     selectedItem: unknown;
 }

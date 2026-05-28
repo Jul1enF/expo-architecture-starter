@@ -4,8 +4,8 @@ import useDropdownPosition from "./useDropdownPosition";
 
 import { RPH, RPW, phoneDevice } from '@/utils/dimensions'
 import { appStyle } from '@/styles/appStyle';
+import { getStringValue, getKeyValue, getItemId } from '@/utils/unknownObjectUtils'
 import { DropDownProps, AutocompleteItem, ScreenLocationType } from "./Autocomplete.types";
-import { itemHasKey, itemHasStringValue } from "@/utils/typeGuards";
 
 type PressTypes = {
     pressLocation: null | ScreenLocationType;
@@ -33,24 +33,26 @@ export default function Dropdown({ flatlistData, setSelectedItem, valueKey, titl
 
 
     // Dropdown item component for the flatlist
-    const DropdownItem = ({ item }: { item: AutocompleteItem | null}) => {
+    const DropdownItem = ({ item }: { item: AutocompleteItem | null }) => {
 
-        const title = (titleKey && itemHasStringValue(item, titleKey)) ? item[titleKey] : itemHasStringValue(item, "title") ? item.title :
-            typeof item === "string" ? item : null
-            
+        const resolvedTitleKey = titleKey ?? "title"
+        const title = typeof item === "string" ? item : getStringValue(item, resolvedTitleKey)
+        const boldTitle = getStringValue(item, "boldTitle")
+        const lightTitle = getStringValue(item, "lightTitle")
+
         return (
             <View style={[appStyle.regularItem, { ...layoutStyle }, { ...dropdownItemStyle }, { marginTop: 0 }]} >
 
                 {item &&
                     <Text style={textStyle}>
 
-                        {itemHasStringValue(item, "boldTitle") &&
+                        {boldTitle &&
                             <Text style={[...textStyle, { fontWeight: boldTitleWeight }]} >
-                                {item.boldTitle}
+                                {boldTitle}
                             </Text>
                         }
 
-                        {itemHasStringValue(item, "lightTitle") ? item.lightTitle : title}
+                        {lightTitle ?? title ?? null}
 
                     </Text>
                 }
@@ -75,9 +77,8 @@ export default function Dropdown({ flatlistData, setSelectedItem, valueKey, titl
             <FlatList
                 data={flatlistData}
                 keyExtractor={(item, index) => {
-                    if (valueKey && itemHasKey(item, valueKey) && itemHasStringValue(item[valueKey], "_id")) return item[valueKey]._id
-                    else if (itemHasStringValue(item, "_id")) return item._id
-                    else return index.toString()
+                    const id = getItemId(item) ?? getItemId(getKeyValue(item, valueKey))
+                    return id ?? index.toString()
                 }}
                 keyboardShouldPersistTaps="handled"
                 nestedScrollEnabled
@@ -89,7 +90,7 @@ export default function Dropdown({ flatlistData, setSelectedItem, valueKey, titl
                 }}
                 renderItem={({ item, index }) =>
                     <TouchableOpacity onPress={() => {
-                        setSelectedItem((valueKey && itemHasKey(item, valueKey)) ? item[valueKey] : item)
+                        setSelectedItem((valueKey ? getKeyValue(item, valueKey) : item))
                         closeDropdown()
                     }} >
                         <DropdownItem item={item} />
@@ -97,7 +98,7 @@ export default function Dropdown({ flatlistData, setSelectedItem, valueKey, titl
                 }
                 ListEmptyComponent={<DropdownItem item={null} />}
                 ItemSeparatorComponent={
-                    ()=> <View style={{ height: 1, backgroundColor: dropdownLineColor }} />
+                    () => <View style={{ height: 1, backgroundColor: dropdownLineColor }} />
                 }
             />
         </View>

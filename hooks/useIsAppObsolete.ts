@@ -12,14 +12,17 @@ const isRunningVersionObsolete = (runningVersion : string | null, minimumVersion
     const runningVersionNumbers = runningVersion.split('.').map(e => Number(e))
     const minimumVersionNumbers = minimumVersion.split('.').map(e => Number(e))
 
-    if (minimumVersionNumbers[0] > runningVersionNumbers[0]) {
+    if (minimumVersionNumbers[0] && runningVersionNumbers[0] && 
+        minimumVersionNumbers[0] > runningVersionNumbers[0]) {
         obsoleteBuild = true
     }
     else if (minimumVersionNumbers[0] == runningVersionNumbers[0]) {
-        if (minimumVersionNumbers[1] > runningVersionNumbers[1]) {
+        if (minimumVersionNumbers[1] && runningVersionNumbers[1] &&
+            minimumVersionNumbers[1] > runningVersionNumbers[1]) {
             obsoleteBuild = true
         } else if (minimumVersionNumbers[1] == runningVersionNumbers[1]) {
-            if (minimumVersionNumbers[2] > runningVersionNumbers[2]) {
+            if (minimumVersionNumbers[2] && runningVersionNumbers[2] &&
+                minimumVersionNumbers[2] > runningVersionNumbers[2]) {
                 obsoleteBuild = true
             }
         }

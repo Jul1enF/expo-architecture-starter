@@ -4,9 +4,9 @@ import Constants from 'expo-constants';
 import { appStyle } from "@/styles/appStyle"
 
 type UseLayoutSpacesOptions = {
-    tabBar?: boolean;
-    secondHeader?: boolean;
-    header?: boolean;
+    tabBar?: boolean | undefined;
+    secondHeader?: boolean | undefined;
+    header?: boolean | undefined;
 }
 
 export default function useLayoutSpaces({ tabBar = true, secondHeader = false, header = true }: UseLayoutSpacesOptions = {}) {

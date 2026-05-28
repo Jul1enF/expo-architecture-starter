@@ -1,20 +1,20 @@
-import { hasId, itemHasKey, itemHasStringValue } from "@/utils/typeGuards"
+import { hasId } from "@/utils/typeGuards"
 import { FindSelectItemTitleOptions } from "./Autocomplete.types"
+import { getStringValue } from "@/utils/unknownObjectUtils"
 
-
-const isPrimitive = (v : unknown) : v is null | string | number | boolean =>
+const isPrimitive = (v: unknown): v is null | string | number | boolean =>
     v === null ||
     typeof v === "string" ||
     typeof v === "number" ||
     typeof v === "boolean"
 
-const isDate = (v : unknown) : v is Date =>
+const isDate = (v: unknown): v is Date =>
     v instanceof Date ||
     (typeof v === "string" && !Number.isNaN(Date.parse(v)))
 
 
 
-const sameArrays = (a :unknown, b : unknown) : boolean => {
+const sameArrays = (a: unknown, b: unknown): boolean => {
     if (!Array.isArray(a) || !Array.isArray(b)) return false
     if (a.length !== b.length) return false
 
@@ -34,7 +34,7 @@ const sameArrays = (a :unknown, b : unknown) : boolean => {
 }
 
 
-const sameObjects = (a : unknown, b : unknown) => {
+const sameObjects = (a: unknown, b: unknown) => {
     if (a === b) return true
     if (!a || !b) return false
     if (typeof a !== "object" || typeof b !== "object") return false
@@ -67,39 +67,42 @@ const sameObjects = (a : unknown, b : unknown) => {
 }
 
 
-export const findSelectedItemTitle = ({ data, valueKey, titleKey, selectedItem } : FindSelectItemTitleOptions) : string => {
+export const findSelectedItemTitle = ({ data, valueKey, titleKey, selectedItem }: FindSelectItemTitleOptions): string => {
 
     let title = ""
     const resolvedTitleKey = titleKey ?? "title"
 
     for (let item of data) {
-        const selectedSection = valueKey && itemHasKey(item, valueKey) ? item[valueKey] : null
+        const itemTitle = getStringValue(item, resolvedTitleKey);
+        const selectedTitle = getStringValue(selectedItem, resolvedTitleKey);
+
+        const selectedSection = valueKey && item[valueKey] ? item[valueKey] : null
 
         // Case where there is no key/value to select in the data array of items (which are objects, prior check in Autocomplete)
 
         if (!valueKey) {
             // selectedItem is an object (because without valueKey the all item is selected), check if a title field match the item title field
-            if (itemHasStringValue(item, resolvedTitleKey) && itemHasStringValue(selectedItem, resolvedTitleKey) && item[resolvedTitleKey] === selectedItem[resolvedTitleKey]) {
-                title = item[resolvedTitleKey]
+            if (itemTitle !== undefined && itemTitle === selectedTitle) {
+                title = itemTitle
                 break;
             }
         }
 
         // There was a section of the items that was selected : trying to find the one matching selectedItem
-        else if (typeof selectedSection === "string" && itemHasStringValue(item, resolvedTitleKey) && selectedSection === selectedItem) {
-            title = item[resolvedTitleKey]
+        else if (typeof selectedSection === "string" && selectedSection === selectedItem) {
+            title = itemTitle ?? ""
             break;
         }
-        else if (hasId(selectedSection) && hasId(selectedItem) && itemHasStringValue(item, resolvedTitleKey) && selectedSection._id === selectedItem._id) {
-            title = item[resolvedTitleKey]
+        else if (hasId(selectedSection) && hasId(selectedItem) && selectedSection._id === selectedItem._id) {
+            title = itemTitle ?? ""
             break;
         }
-        else if (Array.isArray(selectedSection) && itemHasStringValue(item, resolvedTitleKey) && sameArrays(selectedItem, selectedSection)) {
-            title = item[resolvedTitleKey]
+        else if (Array.isArray(selectedSection) && sameArrays(selectedItem, selectedSection)) {
+            title = itemTitle ?? ""
             break;
         }
-        else if (itemHasStringValue(item, resolvedTitleKey) && typeof selectedSection === "object" && sameObjects(selectedItem, selectedSection)) {
-            title = item[resolvedTitleKey]
+        else if (typeof selectedSection === "object" && sameObjects(selectedItem, selectedSection)) {
+            title = itemTitle ?? ""
             break;
         }
     }
@@ -107,7 +110,7 @@ export const findSelectedItemTitle = ({ data, valueKey, titleKey, selectedItem }
 }
 
 
-export const createId = (length : number) => {
+export const createId = (length: number) => {
     const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'.split('')
     let id = ""
     for (let i = 0; i < length; i++) {

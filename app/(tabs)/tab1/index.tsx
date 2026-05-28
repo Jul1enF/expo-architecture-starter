@@ -19,7 +19,7 @@ export default function Tab1Page() {
     { sectionName: "Tab 2", link: "/tab2" },
   ]
  
-  const [selectedSection, setSelectedSection] = useState(sectionsArray[0].sectionName)
+  const [selectedSection, setSelectedSection] = useState("Accueil")
   
   return (
     <>
