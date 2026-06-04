@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "publish:main": "yarn clear-react-native-cache && eas update",
-    "ts-check" : "tsc --noEmit",
+    "ts-check": "tsc --noEmit",
     "clear-react-native-cache": "rm -rf $TMPDIR/react-* && rm -rf $TMPDIR/metro-* && rm -rf $TMPDIR/haste-map-*",
     "clear-expo-cache": "rm -rf node_modules && yarn cache clean && yarn && rm -rf $TMPDIR/react-* && rm -rf $TMPDIR/metro-* && rm -rf $TMPDIR/haste-map-*"
   },
@@ -24,6 +24,7 @@
     "expo-linking": "~55.0.15",
     "expo-router": "~55.0.14",
     "expo-screen-orientation": "~55.0.14",
+    "expo-secure-store": "~55.0.14",
     "expo-splash-screen": "~55.0.20",
     "expo-status-bar": "~55.0.6",
     "react": "19.2.0",

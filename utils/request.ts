@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, RefObject } from "react"
 import { hasId } from "./typeGuards"
+import * as SecureStore from 'expo-secure-store';
 
 // FUNCTION TO COUNT THE NUMBER OF DOCS (ARRAYS OR OBJECTS) REGISTERED IN STORED DATA
 
@@ -54,7 +55,7 @@ type RequestProps = {
     method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     body?: object;
     params?: string | object;
-    jwtToken?: string;
+    sendToken?: boolean;
     setSessionExpired?: Dispatch<SetStateAction<boolean>>;
     functionRef?: RefObject<boolean>;
     setWarning?: Dispatch<SetStateAction<{ text?: string, success?: boolean }>>;
@@ -64,7 +65,7 @@ type RequestProps = {
     storedData?: unknown 
 }
 
-type CustomHeaders = Partial<Record<"Authorization" | "If-None-Match" | "X-Docs-Count" | "Content-Type",
+type CustomHeaders = Partial<Record<"X-Client-Type" | "Authorization" | "If-None-Match" | "X-Docs-Count" | "Content-Type",
     string
 >>
 
@@ -85,7 +86,7 @@ type ApiResponse<SpecificApiData = unknown> = ApiBaseResponse & SpecificApiData
 
 export default async function request<SpecificApiData = unknown>(props: RequestProps) : Promise<ApiResponse<SpecificApiData> | void> 
 {
-    const { path, method = "GET", body, params, jwtToken, setSessionExpired, functionRef, setWarning, setModalVisible, setUploading, clearEtag, storedData } = props
+    const { path, method = "GET", body, params, sendToken, setSessionExpired, functionRef, setWarning, setModalVisible, setUploading, clearEtag, storedData } = props
 
     const warning = !!setWarning
     const modal = !!setModalVisible
@@ -114,12 +115,22 @@ export default async function request<SpecificApiData = unknown>(props: RequestP
 
         const url: string = process.env.EXPO_PUBLIC_BACK_ADDRESS;
 
-        const headers: CustomHeaders = jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {};
-        const options: RequestInit = { method, headers };
-
+        // Headers
+        const headers: CustomHeaders = { "X-Client-Type" : "mobile-app"}
+        if (sendToken) {
+            const jwtToken = await SecureStore.getItemAsync('jwtToken')
+            headers["Authorization"] = `Bearer ${jwtToken}`
+        }
+        
         if (clearEtag) headers["If-None-Match"] = ""
         if (storedData !== undefined) headers["X-Docs-Count"] = getDocsCount(storedData).toString()
 
+
+        // Options
+        const options: RequestInit = { method, headers };
+
+
+        // Body
         if (body) {
             if (body instanceof FormData) {
                 options.body = body;
@@ -129,10 +140,12 @@ export default async function request<SpecificApiData = unknown>(props: RequestP
             }
         }
 
+        // Params
         const urlParams = params
             ? "/" + (Array.isArray(params) ? params.join("/") : params)
             : "";
 
+        // Fetch
         const response = await fetch(`${url}${path}${urlParams}`, options);
         const data = await response.json() as ApiResponse<SpecificApiData>
 

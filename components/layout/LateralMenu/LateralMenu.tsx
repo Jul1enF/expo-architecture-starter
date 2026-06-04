@@ -7,6 +7,7 @@ import { appStyle } from "@/styles/appStyle"
 
 import { logout } from "@/reducers/user";
 import { useAppSelector, useAppDispatch } from "@/store/hooks"
+import * as SecureStore from 'expo-secure-store';
 
 
 // TYPES
@@ -31,15 +32,16 @@ export type LateralMenuItemBase = {
 
 export default function LateralMenu({ menuVisible, setMenuVisible, screenHeight, screenWidth, modalOffsetTop, freeHeight }: LateralMenuProps) {
 
-    const jwtToken = useAppSelector((state) => state.user.value.jwtToken)
+    const isConnected = useAppSelector((state) => state.user.value.isConnected)
     const dispatch = useAppDispatch()
-    const logoutUser = () : void => {
+    const logoutUser = async () : Promise<void> => {
+        await SecureStore.deleteItemAsync('jwtToken')
         dispatch(logout())
     }
 
     const sectionsArray : LateralMenuItemBase[] = [
         { sectionName: "Accueil", link: "/" },
-        { sectionName: jwtToken ? "Se déconnecter" : "Se connecter / S'inscrire", link: jwtToken ? "/" : "/login", func: jwtToken ? logoutUser : undefined },
+        { sectionName: isConnected ? "Se déconnecter" : "Se connecter / S'inscrire", link: isConnected ? "/" : "/login", func: isConnected ? logoutUser : undefined },
         { sectionName: "Tab 2", link: "/tab2" },
     ]
     // user.is_admin && sectionsArray.push({ sectionName: "Écrire / Modifier un article", link: "/redaction" })
