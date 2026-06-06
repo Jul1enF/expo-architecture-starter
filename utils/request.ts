@@ -65,7 +65,7 @@ type RequestProps = {
     storedData?: unknown 
 }
 
-type CustomHeaders = Partial<Record<"X-Client-Type" | "Authorization" | "If-None-Match" | "X-Docs-Count" | "Content-Type",
+type CustomHeaders = Partial<Record<"Authorization" | "If-None-Match" | "X-Docs-Count" | "Content-Type",
     string
 >>
 
@@ -116,10 +116,10 @@ export default async function request<SpecificApiData = unknown>(props: RequestP
         const url: string = process.env.EXPO_PUBLIC_BACK_ADDRESS;
 
         // Headers
-        const headers: CustomHeaders = { "X-Client-Type" : "mobile-app"}
+        const headers: CustomHeaders = { }
         if (sendToken) {
             const jwtToken = await SecureStore.getItemAsync('jwtToken')
-            headers["Authorization"] = `Bearer ${jwtToken}`
+            if (jwtToken) headers["Authorization"] = `Bearer ${jwtToken}`
         }
         
         if (clearEtag) headers["If-None-Match"] = ""
