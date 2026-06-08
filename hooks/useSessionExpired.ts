@@ -10,9 +10,9 @@ export default function useSessionExpired(sessionExpired: boolean, setSessionExp
 
     const logoutUser = async () => {
         setSessionExpired(false)
-        router.push("/")
-        await SecureStore.deleteItemAsync('jwtToken')
+        router.replace("/")
         dispatch(logout())
+        await SecureStore.deleteItemAsync('jwtToken')
     }
 
     useEffect(() => {

@@ -2,7 +2,7 @@ import { Text, TouchableOpacity, StyleSheet } from "react-native"
 import { Dispatch, SetStateAction } from "react";
 import { RPH, RPW, phoneDevice } from "@/utils/dimensions"
 import { appStyle } from "@/styles/appStyle"
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { LateralMenuItemBase } from "./LateralMenu";
 
 type LateralMenuItemProps = LateralMenuItemBase & {
@@ -10,6 +10,8 @@ type LateralMenuItemProps = LateralMenuItemBase & {
 }
 
 export default function LateralMenuItem({sectionName, link, func, setMenuVisible } : LateralMenuItemProps) {
+
+const router = useRouter()
 
 const sectionPress = () => {
     typeof func === "function" && func()

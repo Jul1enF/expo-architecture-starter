@@ -1,5 +1,6 @@
 import { StyleSheet, View, FlatList } from "react-native"
 import { Dispatch, SetStateAction } from "react"
+import { useRouter } from "expo-router"
 import Modal from "react-native-modal"
 import { RPH, RPW, phoneDevice } from "@/utils/dimensions"
 import LateralMenuItem from "./LateralMenuItem"
@@ -23,7 +24,7 @@ type LateralMenuProps = {
 
 export type LateralMenuItemBase = {
     sectionName : string;
-    link?: string;
+    link?: string | null;
     func?: undefined | (() => void) ;
 }
 
@@ -34,14 +35,16 @@ export default function LateralMenu({ menuVisible, setMenuVisible, screenHeight,
 
     const isConnected = useAppSelector((state) => state.user.value.isConnected)
     const dispatch = useAppDispatch()
+    const router = useRouter()
     const logoutUser = async () : Promise<void> => {
-        await SecureStore.deleteItemAsync('jwtToken')
+        router.replace("/")
         dispatch(logout())
+        await SecureStore.deleteItemAsync('jwtToken')
     }
 
     const sectionsArray : LateralMenuItemBase[] = [
         { sectionName: "Accueil", link: "/" },
-        { sectionName: isConnected ? "Se déconnecter" : "Se connecter / S'inscrire", link: isConnected ? "/" : "/login", func: isConnected ? logoutUser : undefined },
+        { sectionName: isConnected ? "Se déconnecter" : "Se connecter / S'inscrire", link: isConnected ? null : "/login", func: isConnected ? logoutUser : undefined },
         { sectionName: "Tab 2", link: "/tab2" },
     ]
     // user.is_admin && sectionsArray.push({ sectionName: "Écrire / Modifier un article", link: "/redaction" })
