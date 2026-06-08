@@ -92,13 +92,13 @@ export default function useDropdownPosition({ dropdownHeight, autocompleteInputR
             }
             setKeyboardMounted(true)
         })
-        const hideSubrscription = Keyboard.addListener("keyboardDidHide", () => {
+        const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
             keyboardHeightRef.current = 0
             setKeyboardMounted(false)
         })
         return () => {
             showSubscription.remove()
-            hideSubrscription.remove()
+            hideSubscription.remove()
         }
     }, [])
 

@@ -72,13 +72,15 @@ export const findSelectedItemTitle = ({ data, valueKey, titleKey, selectedItem }
     let title = ""
     const resolvedTitleKey = titleKey ?? "title"
 
+    // Items are objects, prior check in Autocomplete
+
     for (let item of data) {
         const itemTitle = getStringValue(item, resolvedTitleKey);
         const selectedTitle = getStringValue(selectedItem, resolvedTitleKey);
 
         const selectedSection = valueKey && item[valueKey] ? item[valueKey] : null
 
-        // Case where there is no key/value to select in the data array of items (which are objects, prior check in Autocomplete)
+        // Case where there is no key/value to select in the data array of object items
 
         if (!valueKey) {
             // selectedItem is an object (because without valueKey the all item is selected), check if a title field match the item title field

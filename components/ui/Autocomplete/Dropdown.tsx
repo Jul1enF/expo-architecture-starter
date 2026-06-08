@@ -28,7 +28,8 @@ export default function Dropdown({ flatlistData, setSelectedItem, valueKey, titl
     // Hook to get the dropdown style position
     const dropdownPositionStyle = useDropdownPosition({ dropdownHeight, autocompleteInputRef, tabBar, header, dropdownId, pressLocation, closeDropdown })
 
-    // Item component for the suggestion list
+
+    // Base style of the text + potential override if dropdownTextStyle has been filled
     const textStyle = [styles.dropdownItemText, dropdownTextStyle]
 
 
