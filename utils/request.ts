@@ -8,7 +8,7 @@ import * as SecureStore from 'expo-secure-store';
 const getDocsCount = (storedData: unknown) => {
 
     // Deserialize data if they have been serialized (by redux)
-    const deserializedData : unknown = JSON.parse(JSON.stringify(storedData))
+    const deserializedData: unknown = JSON.parse(JSON.stringify(storedData))
 
     let docsCount = 0
     const visitedDocs = new WeakSet<object>()
@@ -50,7 +50,7 @@ const getDocsCount = (storedData: unknown) => {
 
 // TYPES
 
-type RequestProps = { 
+type RequestProps = {
     path: string;
     method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     body?: object;
@@ -62,7 +62,7 @@ type RequestProps = {
     setModalVisible?: Dispatch<SetStateAction<boolean>>;
     setUploading?: Dispatch<SetStateAction<boolean>>;
     clearEtag?: boolean;
-    storedData?: unknown 
+    storedData?: unknown
 }
 
 type CustomHeaders = Partial<Record<"Authorization" | "If-None-Match" | "X-Docs-Count" | "Content-Type",
@@ -76,6 +76,7 @@ type ApiBaseResponse = {
     sessionExpired?: boolean
     notModified?: boolean
     delay?: number
+    jwtToken?: string
 }
 
 type ApiResponse<SpecificApiData = unknown> = ApiBaseResponse & SpecificApiData
@@ -84,8 +85,7 @@ type ApiResponse<SpecificApiData = unknown> = ApiBaseResponse & SpecificApiData
 
 // FETCH + ERROR HANDLER
 
-export default async function request<SpecificApiData = unknown>(props: RequestProps) : Promise<ApiResponse<SpecificApiData> | void> 
-{
+export default async function request<SpecificApiData = unknown>(props: RequestProps): Promise<ApiResponse<SpecificApiData> | void> {
     const { path, method = "GET", body, params, sendToken, setSessionExpired, functionRef, setWarning, setModalVisible, setUploading, clearEtag, storedData } = props
 
     const warning = !!setWarning
@@ -116,12 +116,12 @@ export default async function request<SpecificApiData = unknown>(props: RequestP
         const url: string = process.env.EXPO_PUBLIC_BACK_ADDRESS;
 
         // Headers
-        const headers: CustomHeaders = { }
+        const headers: CustomHeaders = {}
         if (sendToken) {
             const jwtToken = await SecureStore.getItemAsync('jwtToken')
             if (jwtToken) headers["Authorization"] = `Bearer ${jwtToken}`
         }
-        
+
         if (clearEtag) headers["If-None-Match"] = ""
         if (storedData !== undefined) headers["X-Docs-Count"] = getDocsCount(storedData).toString()
 
@@ -161,7 +161,12 @@ export default async function request<SpecificApiData = unknown>(props: RequestP
         else if (data.notModified) {
             return
         }
+        // Successfull fetch with new data
         else {
+            if (data.jwtToken && typeof data.jwtToken === "string") {
+                await SecureStore.setItemAsync('jwtToken', data.jwtToken)
+                delete data.jwtToken
+            }
             data.successText && displayWarning(data.successText, true)
             data.delay = readingTime(data.successText) + 400
             return data
