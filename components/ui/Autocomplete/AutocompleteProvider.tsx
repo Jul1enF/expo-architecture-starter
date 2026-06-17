@@ -1,7 +1,7 @@
 import { View, StyleSheet, Platform, GestureResponderEvent } from "react-native";
 import { useState, createContext, useContext, useRef } from "react";
 import Dropdown from "./Dropdown";
-import useLayoutSpaces from "@/hooks/useLayoutSpaces";
+import { useLayoutSpaces } from "@/hooks/useLayoutSpaces";
 import { AutocompleteProviderProps, DropDownProps, AutocompleteContextType, ScreenLocationType } from "./Autocomplete.types";
 
 

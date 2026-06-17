@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "@/reducers/user";
 import * as SecureStore from 'expo-secure-store';
 
-export default function useSessionExpired(sessionExpired: boolean, setSessionExpired: Dispatch<SetStateAction<boolean>>) {
+export const useSessionExpired = (sessionExpired: boolean, setSessionExpired: Dispatch<SetStateAction<boolean>>) => {
     const router = useRouter()
     const dispatch = useDispatch()
 

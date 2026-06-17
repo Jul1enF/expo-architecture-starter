@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Keyboard, Platform, Dimensions, ViewStyle } from "react-native";
-import useLayoutSpaces from "@/hooks/useLayoutSpaces";
+import { useLayoutSpaces } from "@/hooks/useLayoutSpaces";
 import { phoneDevice, RPH } from "@/utils/dimensions";
 import { UseDropdownPositionOptions, InputMeasureType } from "./Autocomplete.types";
 

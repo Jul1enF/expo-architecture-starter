@@ -9,7 +9,7 @@ const isBuild = env === "bare" || env === "standalone" ? true : false
 const RNRestart = isBuild ? require("react-native-restart-newarch").default : null
 
 
-export default function useRestartApp() {
+export const useRestartApp = () => {
     const isRestartingRef = useRef(false);
 
     // Function to restart the app

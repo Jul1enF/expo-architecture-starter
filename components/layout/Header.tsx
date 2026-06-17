@@ -10,7 +10,7 @@ import ForcedUpdateModal from "./ForcedUpdateModal";
 import SearchModal from "./SearchModal";
 
 import { useState } from 'react'
-import useLayoutSpaces from "@/hooks/useLayoutSpaces"
+import { useLayoutSpaces } from "@/hooks/useLayoutSpaces"
 import { RPH, RPW, phoneDevice } from "@/utils/dimensions"
 import { appStyle } from "@/styles/appStyle";
 

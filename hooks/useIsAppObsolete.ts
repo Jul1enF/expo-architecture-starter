@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AppState } from 'react-native'
 import * as Application from 'expo-application'
-import request from '@/utils/request'
+import { request } from '@/utils/request'
 
 
 const isRunningVersionObsolete = (runningVersion : string | null, minimumVersion : string) => {
@@ -32,7 +32,7 @@ const isRunningVersionObsolete = (runningVersion : string | null, minimumVersion
 
 
 
-export default function useIsAppObsolete() {
+export const useIsAppObsolete = () => {
 
     const [appObsolete, setAppObsolete] = useState(false)
 

@@ -10,7 +10,7 @@ type UseLayoutSpacesOptions = {
     header?: boolean | undefined;
 }
 
-export default function useLayoutSpaces({ tabBar, secondHeader = false, header = true }: UseLayoutSpacesOptions = {}) {
+export const useLayoutSpaces = ({ tabBar, secondHeader = false, header = true }: UseLayoutSpacesOptions = {}) => {
 
     const tabBarDetected = useNavigationState((state: NavigationState | PartialState<NavigationState> | undefined) => {
         if (!state) return false;

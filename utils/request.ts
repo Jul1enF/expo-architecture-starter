@@ -85,7 +85,7 @@ type ApiResponse<SpecificApiData = unknown> = ApiBaseResponse & SpecificApiData
 
 // FETCH + ERROR HANDLER
 
-export default async function request<SpecificApiData = unknown>(props: RequestProps): Promise<ApiResponse<SpecificApiData> | void> {
+export const request = async <SpecificApiData = unknown>(props: RequestProps): Promise<ApiResponse<SpecificApiData> | void> => {
     const { path, method = "GET", body, params, sendToken, setSessionExpired, functionRef, setWarning, setModalVisible, setUploading, clearEtag, storedData } = props
 
     const warning = !!setWarning

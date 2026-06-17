@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import useLayoutSpaces from "@/hooks/useLayoutSpaces";
+import { useLayoutSpaces } from "@/hooks/useLayoutSpaces";
 import Modal from "react-native-modal"
 import Button from "@/components/ui/Button";
 
