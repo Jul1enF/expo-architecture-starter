@@ -39,7 +39,7 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         login: (state: UserState, action: PayloadAction<User>) => {
-            state.value = action.payload
+            state.value = {...action.payload, isConnected : true}
         },
         logout: (state: UserState) => {
             state.value = { ...initialState.value }
